@@ -1,0 +1,8 @@
+discord.py
+python-dotenv
+openai
+firebase-admin
+aiosqlite
+pillow
+pandas
+pdfminer.six
