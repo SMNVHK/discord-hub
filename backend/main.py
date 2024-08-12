@@ -85,9 +85,9 @@ BOT_MESSAGES = {
 }
 
 # Initialiser Firebase
-cred = credentials.Certificate("path/to/your/serviceAccountKey.json")
+cred = credentials.Certificate("C:\Users\IA\Desktop\user-interface-bot\ai-learning-hub\backend\firebase-adminsdk.json")
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://your-project-id.firebaseio.com/'
+    'databaseURL': 'https://discord-hub-e79d6-default-rtdb.europe-west1.firebasedatabase.app/'
 })
 
 class ImprovedBot(commands.Bot):
