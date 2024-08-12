@@ -22,8 +22,7 @@ Misc
 .DS_Store
 .pnp
 .pnp.js
-/coverage
-ui-botdiscord-firebase-adminsdk-gbyru-a02b224f78.json
+
 
 Test files
 *.test.js
