@@ -85,7 +85,8 @@ BOT_MESSAGES = {
 }
 
 # Initialiser Firebase
-cred = credentials.Certificate("C:\Users\IA\Desktop\user-interface-bot\ai-learning-hub\backend\firebase-adminsdk.json")
+credpath = os.environ.get('FIREBASEADMIN_SDK_PATH', 'firebase-adminsdk.json')
+cred = credentials.Certificate(os.path.join(os.path.dirname(__file), cred_path))
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://discord-hub-e79d6-default-rtdb.europe-west1.firebasedatabase.app/'
 })
