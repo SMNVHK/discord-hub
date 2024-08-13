@@ -11,22 +11,14 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
-// Vérification que toutes les variables d'environnement sont définies
-const requiredEnvVars = [
-  'REACT_APP_FIREBASE_API_KEY',
-  'REACT_APP_FIREBASE_AUTH_DOMAIN',
-  'REACT_APP_FIREBASE_DATABASE_URL',
-  'REACT_APP_FIREBASE_PROJECT_ID',
-  'REACT_APP_FIREBASE_STORAGE_BUCKET',
-  'REACT_APP_FIREBASE_MESSAGING_SENDER_ID',
-  'REACT_APP_FIREBASE_APP_ID'
-];
+const missingVars = Object.entries(firebaseConfig)
+  .filter(([key, value]) => !value)
+  .map(([key]) => key);
 
-requiredEnvVars.forEach(varName => {
-  if (!process.env[varName]) {
-    console.error("La variable d'environnement ${varName} n'est pas définie.");
-  }
-});
+if (missingVars.length > 0) {
+  console.error(`Les variables d'environnement suivantes ne sont pas définies : ${missingVars.join(", ")}`);
+  throw new Error("Configuration Firebase incomplète");
+}
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
