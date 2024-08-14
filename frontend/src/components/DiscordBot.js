@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, TextField, Button, Paper } from '@mui/material';
+import { Container, Typography, TextField, Button, Paper, List, ListItem, ListItemText } from '@mui/material';
 import { db } from '../services/firebase';
 import { ref, push, onChildAdded, query, orderByChild, limitToLast } from "firebase/database";
 
@@ -24,7 +24,7 @@ function DiscordBot() {
       push(messagesRef, {
         text: input,
         sender: 'user',
-        userId: 'web_user', // Vous pouvez implémenter un système d'authentification pour avoir des IDs uniques
+        userId: 'web_user',
         timestamp: Date.now()
       });
       setInput('');
@@ -36,6 +36,20 @@ function DiscordBot() {
       <Typography variant="h2" gutterBottom>
         Discord Bot Interface
       </Typography>
+      <Paper style={{ padding: '20px', marginBottom: '20px' }}>
+        <Typography variant="h5" gutterBottom>Comment utiliser le bot Discord</Typography>
+        <List>
+          <ListItem>
+            <ListItemText primary="!hub" secondary="Affiche les informations sur le AI Learning Hub" />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="!quiz" secondary="DÃ©marre un quiz IA interactif" />
+          </ListItem>
+          <ListItem>
+            <ListItemText primary="!delete_history" secondary="Supprime votre historique de conversation" />
+          </ListItem>
+        </List>
+      </Paper>
       <Paper style={{ height: 400, overflowY: 'scroll', marginBottom: 20, padding: 10 }}>
         {messages.map((msg, index) => (
           <Typography key={index} style={{ marginBottom: 10, textAlign: msg.sender === 'user' ? 'right' : 'left' }}>

@@ -85,8 +85,8 @@ BOT_MESSAGES = {
 }
 
 # Initialiser Firebase
-credpath = os.environ.get('FIREBASEADMIN_SDK_PATH', 'firebase-adminsdk.json')
-cred = credentials.Certificate(os.path.join(os.path.dirname(__file), cred_path))
+cred_path = os.environ.get('FIREBASE_ADMIN_SDK_PATH', 'firebase-adminsdk.json')
+cred = credentials.Certificate(os.path.join(os.path.dirname(__file__), cred_path))
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://discord-hub-e79d6-default-rtdb.europe-west1.firebasedatabase.app/'
 })
@@ -243,25 +243,46 @@ class ImprovedBot(commands.Bot):
                     response = await self.get_openai_response(message['userId'], [{"type": "text", "text": message['text']}])
                     # La réponse est déjà envoyée à Firebase dans get_openai_response
 
-    @bot.command(name='interface')
-    async def interface(ctx):
-       ui_link = "https://votre-domaine.com/ai-learning-hub"
-       embed = discord.Embed(title="Interface AI Learning Hub", 
-                             description=f"Accédez à l'interface web ici : {ui_link}", 
-                             color=0x00ff00)
-       await ctx.send(embed=embed)
+    @commands.command(name='hub')
+    async def hub(self, ctx):
+        ui_link = "https://discord-hub-e79d6.netlify.app/"  # Remplacez par votre URL Netlify réelle
+        embed = discord.Embed(title="AI Learning Hub", 
+                              description=f"Accédez à notre plateforme d'apprentissage IA interactive ici : {ui_link}", 
+                              color=0x00ff00)
+        embed.add_field(name="Fonctionnalités", value="• Quêtes\n• Laboratoire IA\n• Quiz\n• Assistant de Code\n• Brainstorming", inline=False)
+        embed.set_footer(text="Utilisez le hub pour une expérience d'apprentissage complète!")
+        await ctx.send(embed=embed)
 
-    @bot.command(name='quiz')
-    async def quiz(ctx):
-       # Récupérer une question de quiz depuis Firebase
-       question = get_random_question_from_firebase()
-       
-       embed = discord.Embed(title="Quiz IA", description=question['question'], color=0x00ff00)
-       for i, option in enumerate(question['options']):
-           embed.add_field(name=f"Option {i+1}", value=option, inline=False)
-       
-       await ctx.send(embed=embed)
-       # Logique pour gérer les réponses...
+    @commands.command(name='quiz')
+    async def quiz(self, ctx):
+        # Récupérer une question de quiz depuis Firebase
+        ref = db.reference('quiz/questions')
+        questions = ref.get()
+        if not questions:
+            await ctx.send("Désolé, je n'ai pas de questions de quiz disponibles pour le moment. Mes neurones sont en grève ! 🧠🚫")
+            return
+        
+        question = random.choice(list(questions.values()))
+        
+        embed = discord.Embed(title="Quiz IA", description=question['question'], color=0x00ff00)
+        for i, option in enumerate(question['options']):
+            embed.add_field(name=f"Option {i+1}", value=option, inline=False)
+        
+        embed.set_footer(text="Répondez avec le numéro de l'option choisie")
+        quiz_message = await ctx.send(embed=embed)
+        
+        def check(m):
+            return m.author == ctx.author and m.channel == ctx.channel and m.content.isdigit() and 1 <= int(m.content) <= len(question['options'])
+        
+        try:
+            user_answer = await self.wait_for('message', check=check, timeout=30.0)
+            selected_option = int(user_answer.content) - 1
+            if question['options'][selected_option] == question['correctAnswer']:
+                await ctx.send("Bravo ! Vous avez la réponse correcte. Vous méritez une médaille en chocolat ! 🏅🍫")
+            else:
+                await ctx.send(f"Oups, ce n'est pas la bonne réponse. La réponse correcte était : {question['correctAnswer']}. Ne vous inquiétez pas, Einstein s'est trompé aussi... une fois... peut-être. 🤓")
+        except asyncio.TimeoutError:
+            await ctx.send("Le temps est écoulé ! Vous réfléchissez plus lentement qu'un escargot sous somnifères. 🐌💤")
 
 bot = ImprovedBot()
 
